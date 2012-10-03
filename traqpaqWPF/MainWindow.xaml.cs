@@ -51,7 +51,10 @@ namespace traqpaqWPF
             {
                 traqpaq = new TraqpaqDevice();
                 // update status bar
-                statusBarItemTraqpaq.Content = "Device connected: " + traqpaq.myOTPreader.SerialNumber;
+                //traqpaq.myOTPreader.reqSerialNumber();
+                statusBarItemTraqpaq.Content = "Device connected";
+                oneTimeRead();
+
             }
             catch (TraqPaqNotConnectedException)
             {
@@ -63,12 +66,6 @@ namespace traqpaqWPF
                 deviceNotifier = DeviceNotifier.OpenDeviceNotifier();
                 deviceNotifier.OnDeviceNotify += new EventHandler<DeviceNotifyEventArgs>(deviceNotifier_OnDeviceNotify);
             }
-
-            // Create the pages and save to array
-            pages = new Page[] { new WelcomePage(this), new RecordTablePage(this), new DataPage(this), new ImportPage(this) };
-
-            // Go to the welcome page
-            navigatePage(PageName.WELCOME);
         }
 
         /// <summary>
@@ -86,14 +83,21 @@ namespace traqpaqWPF
                     try
                     {
                         traqpaq = new TraqpaqDevice();
+                        statusBarItemTraqpaq.Content = "Device connected";
+                        oneTimeRead();
                     }
                     catch (TraqPaqNotConnectedException) { }    // Silently fail
                 }
             }
-            else
+            else if(e.EventType == EventType.DeviceRemoveComplete)
             {
                 //TODO use this to disconnect the device. The event handler would need to be created regardless
                 //of wether or not the device is connected at first though.
+                if (traqpaq.MyUSBDevice.IsOpen)
+                {
+                    traqpaq.MyUSBDevice.Close();
+                    statusBarItemTraqpaq.Content = "Device not found";
+                }
             }
         }
 
@@ -101,11 +105,11 @@ namespace traqpaqWPF
         {
             if (p == PageName.WELCOME)
             {
-                buttonBack.Visibility = System.Windows.Visibility.Hidden;
+                //buttonBack.Visibility = System.Windows.Visibility.Hidden;
             }
             else
             {
-                buttonBack.Visibility = System.Windows.Visibility.Visible;
+                //buttonBack.Visibility = System.Windows.Visibility.Visible;
             }
             frame1.Navigate(pages[(int)p]);
         }
@@ -117,7 +121,7 @@ namespace traqpaqWPF
                 frame1.GoBack();
                 if (!frame1.CanGoBack)
                 {   // if can't go back anymore, hide the back button
-                    buttonBack.Visibility = System.Windows.Visibility.Hidden;
+                    //buttonBack.Visibility = System.Windows.Visibility.Hidden;
                 }
             }
         }
@@ -127,16 +131,16 @@ namespace traqpaqWPF
         /// </summary>
         private void buttonLogin_Click(object sender, RoutedEventArgs e)
         {
-            LoginWindow login = new LoginWindow();
-            if (login.ShowDialog() == true)
-            {
+            //LoginWindow login = new LoginWindow();
+            //if (login.ShowDialog() == true)
+            //{
                 Label username = new Label();
-                username.Content = (string)login.Tag;
-                stackPanelLogin.Children.Add(username);
+                //username.Content = (string)login.Tag;
+                //stackPanelLogin.Children.Add(username);
                 // change the login button to be the logout button
-                buttonLogin.Visibility = System.Windows.Visibility.Hidden;
-                buttonLogout.Visibility = System.Windows.Visibility.Visible;
-            }
+                //buttonLogin.Visibility = System.Windows.Visibility.Hidden;
+                //buttonLogout.Visibility = System.Windows.Visibility.Visible;
+            //}
         }
 
         /// <summary>
@@ -145,10 +149,22 @@ namespace traqpaqWPF
         /// </summary>
         private void buttonLogout_Click(object sender, RoutedEventArgs e)
         {
-            stackPanelLogin.Children.Clear();
+            //stackPanelLogin.Children.Clear();
             // revert to the login button
-            buttonLogin.Visibility = System.Windows.Visibility.Visible;
-            buttonLogout.Visibility = System.Windows.Visibility.Hidden;
+            //buttonLogin.Visibility = System.Windows.Visibility.Visible;
+            //buttonLogout.Visibility = System.Windows.Visibility.Hidden;
+        }
+
+        private void oneTimeRead( ){
+            traqpaq.myOTPreader.reqSerialNumber();
+            traqpaq.myOTPreader.reqTesterID();
+            traqpaq.myOTPreader.reqHardwareVersion();
+            traqpaq.myOTPreader.reqApplicationVersion();
+
+            label_OTP_AppVersion.Content = traqpaq.myOTPreader.ApplicationVersion;
+            label_OTP_HwVersion.Content = traqpaq.myOTPreader.HardwareVersion;
+            label_OTP_SerialNumber.Content = traqpaq.myOTPreader.SerialNumber;
+            label_OTP_TesterID.Content = traqpaq.myOTPreader.TesterID;
         }
     }
 }

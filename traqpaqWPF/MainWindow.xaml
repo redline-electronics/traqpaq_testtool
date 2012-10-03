@@ -20,18 +20,22 @@
                 <ProgressBar Name="progressBar1" Width="100" />
             </StatusBarItem>            
             <Separator Width="1" Background="Gray" HorizontalAlignment="Left" />
-            <StatusBarItem Name="statusBarItemTraqpaq" Width="150" HorizontalAlignment="Left"/>
+            <StatusBarItem Name="statusBarItemTraqpaq" Width="200" HorizontalAlignment="Left"/>
             <Separator Width="1" HorizontalAlignment="Left" Background="Gray" Grid.Column="1"/>
         </StatusBar>
-        <Button Style="{StaticResource GlassButton}" Name="buttonBack" FontSize="12" Click="buttonBack_Click" 
-                FontFamily="Comic Sans MS" FontStyle="Normal" FontWeight="Bold" Background="Black" Margin="1" IsTabStop="False">
-            <Image Width="Auto" Height="18" Source="/traqpaqWPF;component/Images/white_arrow_transparent.png" />
-        </Button>
-        <Button Content="Log In" Grid.Column="2" HorizontalAlignment="Right" Name="buttonLogin" IsTabStop="False"
-                VerticalAlignment="Stretch" Width="50" Click="buttonLogin_Click" Style="{StaticResource LoginButton}"/>
-        <Button Content="Log Out" Grid.Column="2" HorizontalAlignment="Right" Name="buttonLogout" IsTabStop="False"
-                VerticalAlignment="Stretch" Width="50" Click="buttonLogout_Click" Style="{StaticResource LogoutButton}"
-                Visibility="Hidden" />
-        <StackPanel Grid.Column="1" Name="stackPanelLogin" HorizontalAlignment="Right" Orientation="Horizontal" />
+        <GroupBox Grid.Column="1" Grid.Row="1" Header="OTP Data" Height="181" HorizontalAlignment="Left" Name="groupBox1" VerticalAlignment="Top" Width="249">
+            <Grid>
+                <Label Content="Serial Number:" FontWeight="SemiBold" Height="25" HorizontalAlignment="Left" Margin="10,10,0,0" Name="label3" VerticalAlignment="Top" Width="100" />
+                <Label Content="App Version:" FontWeight="SemiBold" Height="25" HorizontalAlignment="Left" Margin="10,26,0,0" Name="label4" VerticalAlignment="Top" Width="100" />
+                <Label Content="HW Version:" FontWeight="SemiBold" Height="25" HorizontalAlignment="Left" Margin="10,43,0,0" Name="label5" VerticalAlignment="Top" Width="100" />
+                <Label Content="Tester ID:" FontWeight="SemiBold" Height="25" HorizontalAlignment="Left" Margin="10,59,0,0" Name="label6" VerticalAlignment="Top" Width="100" />
+                <Label Content="OTP Read" FontWeight="SemiBold" Height="25" HorizontalAlignment="Left" Margin="10,89,0,0" Name="label1" VerticalAlignment="Top" Width="100" />
+                <Label Content="&lt;N/A&gt;" FontWeight="Normal" Height="25" HorizontalAlignment="Left" Margin="90,10,0,0" Name="label_OTP_SerialNumber" VerticalAlignment="Top" Width="100" />
+                <Label Content="&lt;N/A&gt;" FontWeight="Normal" Height="25" HorizontalAlignment="Left" Margin="90,26,0,0" Name="label_OTP_AppVersion" VerticalAlignment="Top" Width="100" />
+                <Label Content="&lt;N/A&gt;" FontWeight="Normal" Height="25" HorizontalAlignment="Left" Margin="90,43,0,0" Name="label_OTP_HwVersion" VerticalAlignment="Top" Width="100" />
+                <Label Content="&lt;N/A&gt;" FontWeight="Normal" Height="25" HorizontalAlignment="Left" Margin="90,59,0,0" Name="label_OTP_TesterID" VerticalAlignment="Top" Width="100" />
+                <Label Content="&lt;N/A&gt;" FontWeight="Normal" Height="49" HorizontalAlignment="Left" Margin="10,103,0,0" Name="label_OTP_Read" VerticalAlignment="Top" Width="221" />
+            </Grid>
+        </GroupBox>
     </Grid>
 </Window>
