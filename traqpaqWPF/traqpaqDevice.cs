@@ -849,9 +849,9 @@ namespace traqpaqWPF
 
         public Position(byte[] readBuff)
         {
-            latitude = BetterBitConverter.ToDouble(readBuff, 0);
-            longitude = BetterBitConverter.ToDouble(readBuff, 4);
-            heading = BetterBitConverter.ToDouble(readBuff, 8);
+            latitude = BetterBitConverter.ToInt32(readBuff, 0) / Constants.LATITUDE_LONGITUDE_COORD;
+            longitude = BetterBitConverter.ToInt32(readBuff, 4) / Constants.LATITUDE_LONGITUDE_COORD;
+            heading = BetterBitConverter.ToInt16(readBuff, 8) / Constants.COURSE_FACTOR;
         }
     }
 

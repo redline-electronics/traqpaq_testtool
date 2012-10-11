@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -11,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using LibUsbDotNet;
 using LibUsbDotNet.Main;
 using LibUsbDotNet.Info;
@@ -19,7 +21,6 @@ using LibUsbDotNet.DeviceNotify.Info;
 
 namespace traqpaqWPF
 {
-    public enum PageName { WELCOME, RECORDS, DATA, IMPORT };
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -27,6 +28,7 @@ namespace traqpaqWPF
     public partial class MainWindow : Window
     {
         public Page[] pages;
+        public DispatcherTimer autoReadTimer;
         public TraqpaqDevice traqpaq;
         /// <summary>
         /// Used to detect when a device is connected, 
@@ -45,6 +47,12 @@ namespace traqpaqWPF
         public MainWindow()
         {
             InitializeComponent();
+
+            autoReadTimer = new DispatcherTimer();
+            autoReadTimer.Tick += new EventHandler(autoReadObjects);
+            autoReadTimer.Interval = new TimeSpan(0, 0, 1);   // Hours, Minutes, Seconds
+
+            
             
             // try to connect to device. Show status in status bar
             try
@@ -54,6 +62,7 @@ namespace traqpaqWPF
                 //traqpaq.myOTPreader.reqSerialNumber();
                 statusBarItemTraqpaq.Content = "Device connected";
                 oneTimeRead();
+                autoReadTimer.Start();
 
             }
             catch (TraqPaqNotConnectedException)
@@ -85,6 +94,7 @@ namespace traqpaqWPF
                         traqpaq = new TraqpaqDevice();
                         statusBarItemTraqpaq.Content = "Device connected";
                         oneTimeRead();
+                        autoReadTimer.Start();
                     }
                     catch (TraqPaqNotConnectedException) { }    // Silently fail
                 }
@@ -97,62 +107,9 @@ namespace traqpaqWPF
                 {
                     traqpaq.MyUSBDevice.Close();
                     statusBarItemTraqpaq.Content = "Device not found";
+                    autoReadTimer.Stop();
                 }
             }
-        }
-
-        public void navigatePage(PageName p)
-        {
-            if (p == PageName.WELCOME)
-            {
-                //buttonBack.Visibility = System.Windows.Visibility.Hidden;
-            }
-            else
-            {
-                //buttonBack.Visibility = System.Windows.Visibility.Visible;
-            }
-            frame1.Navigate(pages[(int)p]);
-        }
-
-        private void buttonBack_Click(object sender, RoutedEventArgs e)
-        {
-            if (frame1.CanGoBack)
-            {
-                frame1.GoBack();
-                if (!frame1.CanGoBack)
-                {   // if can't go back anymore, hide the back button
-                    //buttonBack.Visibility = System.Windows.Visibility.Hidden;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Show the login window and let the user attempt to login
-        /// </summary>
-        private void buttonLogin_Click(object sender, RoutedEventArgs e)
-        {
-            //LoginWindow login = new LoginWindow();
-            //if (login.ShowDialog() == true)
-            //{
-                Label username = new Label();
-                //username.Content = (string)login.Tag;
-                //stackPanelLogin.Children.Add(username);
-                // change the login button to be the logout button
-                //buttonLogin.Visibility = System.Windows.Visibility.Hidden;
-                //buttonLogout.Visibility = System.Windows.Visibility.Visible;
-            //}
-        }
-
-        /// <summary>
-        /// Button is only visible if the user is logged in.
-        /// If clicked, it logs the user out and shows the login button
-        /// </summary>
-        private void buttonLogout_Click(object sender, RoutedEventArgs e)
-        {
-            //stackPanelLogin.Children.Clear();
-            // revert to the login button
-            //buttonLogin.Visibility = System.Windows.Visibility.Visible;
-            //buttonLogout.Visibility = System.Windows.Visibility.Hidden;
         }
 
         private void oneTimeRead( ){
@@ -165,6 +122,44 @@ namespace traqpaqWPF
             label_OTP_HwVersion.Content = traqpaq.myOTPreader.HardwareVersion;
             label_OTP_SerialNumber.Content = traqpaq.myOTPreader.SerialNumber;
             label_OTP_TesterID.Content = traqpaq.myOTPreader.TesterID;
+            label_OTP_Read.Text = BitConverter.ToString(traqpaq.myOTPreader.readOTP(64, 64));
+
+
+            label_GPS_SerialNumber.Content = traqpaq.getGPS_SerialNo();
+            label_GPS_PartNumber.Content = traqpaq.getGPS_PartNo();
+            label_GPS_SWVersion.Content = traqpaq.getGPS_SW_Version();
+            label_GPS_SWDate.Content = traqpaq.getGPS_SW_Date();
+
+
+        }
+
+        private void autoReadObjects(object sender, EventArgs e)
+        {
+            Position currentPosition;
+
+            currentPosition = traqpaq.getGPS_CurrentPosition();
+
+            label_GPS_Latitude.Content = currentPosition.latitude.ToString();
+            label_GPS_Longitude.Content = currentPosition.longitude.ToString();
+            label_GPS_Heading.Content = currentPosition.heading.ToString();
+        }
+
+        private void button_GPS_View_Click(object sender, RoutedEventArgs e)
+        {
+            byte zoom = 14;         // zoom level (1-20)
+            char type = 'm';        // "m" map, "k" satellite, "h" hybrid, "p" terrain, "e" GoogleEarth
+
+            //mapView.Navigate("http://maps.google.com/maps?" + 
+            //                "z=" + zoom.ToString() + 
+            //                "&t=" + type.ToString() +
+            //                "&q=loc:" + label_GPS_Latitude.Content + "+" + label_GPS_Longitude.Content
+            //                );
+
+            mapView.Navigate("http://maps.googleapis.com/maps/api/staticmap?center=" +
+                            label_GPS_Latitude.Content + "," + label_GPS_Longitude.Content +
+                            "&zoom=" + zoom.ToString() +
+                            "&size=255x195&maptype=roadmap&sensor=false" +
+                            "&markers=color:red%7Ccolor:red%7C%7C" + label_GPS_Latitude.Content + "," + label_GPS_Longitude.Content);
         }
     }
 }
