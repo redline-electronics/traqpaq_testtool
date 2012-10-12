@@ -286,7 +286,7 @@ namespace traqpaqWPF
             {
                 if (traqpaq.sendCommand(USBcommand.USB_CMD_REQ_BATTERY_INSTANT, InstCurrentRead))
                 {
-                    this.CurrentInst = BetterBitConverter.ToUInt16(InstCurrentRead, 0) * Constants.BATT_INST_CURRENT_FACTOR;
+                    this.CurrentInst = BetterBitConverter.ToInt16(InstCurrentRead, 0) * Constants.BATT_INST_CURRENT_FACTOR;
                     return true;
                 }
                 else return false;

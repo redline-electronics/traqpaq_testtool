@@ -122,7 +122,7 @@ namespace traqpaqWPF
             label_OTP_HwVersion.Content = traqpaq.myOTPreader.HardwareVersion;
             label_OTP_SerialNumber.Content = traqpaq.myOTPreader.SerialNumber;
             label_OTP_TesterID.Content = traqpaq.myOTPreader.TesterID;
-            label_OTP_Read.Text = BitConverter.ToString(traqpaq.myOTPreader.readOTP(64, 64));
+            label_OTP_Read.Text = BitConverter.ToString(traqpaq.myOTPreader.readOTP(64, 64)).Replace("-", " ");
 
 
             label_GPS_SerialNumber.Content = traqpaq.getGPS_SerialNo();
@@ -130,7 +130,7 @@ namespace traqpaqWPF
             label_GPS_SWVersion.Content = traqpaq.getGPS_SW_Version();
             label_GPS_SWDate.Content = traqpaq.getGPS_SW_Date();
 
-
+            progress_Flash_FreeSpace.Value = traqpaq.getFlashPercentUsed();
         }
 
         private void autoReadObjects(object sender, EventArgs e)
@@ -142,6 +142,19 @@ namespace traqpaqWPF
             label_GPS_Latitude.Content = currentPosition.latitude.ToString();
             label_GPS_Longitude.Content = currentPosition.longitude.ToString();
             label_GPS_Heading.Content = currentPosition.heading.ToString();
+            
+            traqpaq.battery.reqBatteryVoltage();
+            label_Battery_Voltage.Content = traqpaq.battery.Voltage.ToString("0.00 V");
+
+            traqpaq.battery.reqBatteryTemp();
+            label_Battery_Temperature.Content = traqpaq.battery.Temperature.ToString("0.0 C");
+
+            traqpaq.battery.reqBatteryInstCurrent();
+            label_Battery_Instant_Current.Content = traqpaq.battery.CurrentInst.ToString("0.0 mA");
+
+            traqpaq.battery.reqBatteryAccumCurrent();
+            label_Battery_Accum_Current.Content = traqpaq.battery.CurrentAccum.ToString("0.0 mAh");
+            progress_Battery_Meter.Value = (traqpaq.battery.CurrentAccum / 3200) * 100;  // TODO: Replace 3200 with battery capacity counts constant
         }
 
         private void button_GPS_View_Click(object sender, RoutedEventArgs e)
@@ -160,6 +173,11 @@ namespace traqpaqWPF
                             "&zoom=" + zoom.ToString() +
                             "&size=255x195&maptype=roadmap&sensor=false" +
                             "&markers=color:red%7Ccolor:red%7C%7C" + label_GPS_Latitude.Content + "," + label_GPS_Longitude.Content);
+        }
+
+        private void button_OTP_Serialize_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }
